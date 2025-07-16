@@ -1,8 +1,6 @@
 package com.super_market.controller;
 
-import com.super_market.model.Employee;
-import com.super_market.model.Permission;
-import com.super_market.model.RolePermissions;
+import com.super_market.model.*;
 import com.super_market.repository.EmployeeRepository;
 import com.super_market.service.AdminService;
 import com.super_market.service.EmployeeService;
@@ -24,6 +22,8 @@ public class AdminController {
     private AdminService adminService;
     @Autowired
     private EmployeeRepository employeeRepository;
+
+    //Employee Controller
 
     @PostMapping("/employees")
     public ResponseEntity<?> createEmployee(@RequestHeader("loggedInEmail") String loggedInEmail,
@@ -94,6 +94,156 @@ public class AdminController {
             return ResponseEntity.ok(result.get());
         } else {
             return ResponseEntity.status(404).body(Collections.singletonMap("error", "Employee not found"));
+        }
+    }
+
+    // Product Controller
+
+    @PostMapping("/products")
+    public ResponseEntity<?> createProduct(@RequestHeader("loggedInEmail") String loggedInEmail,
+                                           @RequestBody Product product) {
+        Optional<Employee> admin = employeeService.getEmployeeByEmail(loggedInEmail);
+
+        if (admin.isEmpty() || !RolePermissions.hasPermission(admin.get().getRole(), Permission.CREATE_PRODUCT)) {
+            return ResponseEntity.status(403).body(Collections.singletonMap("error", "Access denied!"));
+        }
+
+        Product created = adminService.createProduct(product);
+        return ResponseEntity.ok(Collections.singletonMap("message", "Product created successfully with ID " + created.getId()));
+    }
+
+    @PutMapping("/products/{id}")
+    public ResponseEntity<?> updateProduct(@RequestHeader("loggedInEmail") String loggedInEmail,
+                                           @PathVariable Long id,
+                                           @RequestBody Product productDetails) {
+        Optional<Employee> admin = employeeService.getEmployeeByEmail(loggedInEmail);
+
+        if (admin.isEmpty() || !RolePermissions.hasPermission(admin.get().getRole(), Permission.UPDATE_PRODUCT)) {
+            return ResponseEntity.status(403).body(Collections.singletonMap("error", "Access denied!"));
+        }
+
+        Product updated = adminService.updateProduct(id, productDetails);
+        if (updated != null) {
+            return ResponseEntity.ok(Collections.singletonMap("message", "Product updated successfully"));
+        } else {
+            return ResponseEntity.status(404).body(Collections.singletonMap("error", "Product not found"));
+        }
+    }
+
+    @DeleteMapping("/products/{id}")
+    public ResponseEntity<?> deleteProduct(@RequestHeader("loggedInEmail") String loggedInEmail,
+                                           @PathVariable Long id) {
+        Optional<Employee> admin = employeeService.getEmployeeByEmail(loggedInEmail);
+
+        if (admin.isEmpty() || !RolePermissions.hasPermission(admin.get().getRole(), Permission.DELETE_PRODUCT)) {
+            return ResponseEntity.status(403).body(Collections.singletonMap("error", "Access denied!"));
+        }
+
+        adminService.deleteProduct(id);
+        return ResponseEntity.ok(Collections.singletonMap("message", "Product deleted successfully"));
+    }
+
+    @GetMapping("/products")
+    public ResponseEntity<?> getAllProducts(@RequestHeader("loggedInEmail") String loggedInEmail) {
+        Optional<Employee> admin = employeeService.getEmployeeByEmail(loggedInEmail);
+
+        if (admin.isEmpty() || !RolePermissions.hasPermission(admin.get().getRole(), Permission.READ_ALL_PRODUCTS)) {
+            return ResponseEntity.status(403).body(Collections.singletonMap("error", "Access denied!"));
+        }
+
+        List<Product> products = adminService.getAllProducts();
+        return ResponseEntity.ok(products);
+    }
+
+    @GetMapping("/products/{id}")
+    public ResponseEntity<?> getProductById(@RequestHeader("loggedInEmail") String loggedInEmail,
+                                            @PathVariable Long id) {
+        Optional<Employee> admin = employeeService.getEmployeeByEmail(loggedInEmail);
+
+        if (admin.isEmpty() || !RolePermissions.hasPermission(admin.get().getRole(), Permission.READ_ALL_PRODUCTS)) {
+            return ResponseEntity.status(403).body(Collections.singletonMap("error", "Access denied!"));
+        }
+
+        Optional<Product> result = adminService.getProductById(id);
+        if (result.isPresent()) {
+            return ResponseEntity.ok(result.get());
+        } else {
+            return ResponseEntity.status(404).body(Collections.singletonMap("error", "Product not found"));
+        }
+    }
+
+    //Section Controller
+
+    @PostMapping("/sections")
+    public ResponseEntity<?> createSection(@RequestHeader("loggedInEmail") String loggedInEmail,
+                                           @RequestBody Section section) {
+        Optional<Employee> admin = employeeService.getEmployeeByEmail(loggedInEmail);
+
+        if (admin.isEmpty() || !RolePermissions.hasPermission(admin.get().getRole(), Permission.CREATE_SECTION)) {
+            return ResponseEntity.status(403).body(Collections.singletonMap("error", "Access denied!"));
+        }
+
+        Section created = adminService.createSection(section);
+        return ResponseEntity.ok(Collections.singletonMap("message", "Section created successfully with ID " + created.getId()));
+    }
+
+    @PutMapping("/sections/{id}")
+    public ResponseEntity<?> updateSection(@RequestHeader("loggedInEmail") String loggedInEmail,
+                                           @PathVariable Long id,
+                                           @RequestBody Section sectionDetails) {
+        Optional<Employee> admin = employeeService.getEmployeeByEmail(loggedInEmail);
+
+        if (admin.isEmpty() || !RolePermissions.hasPermission(admin.get().getRole(), Permission.UPDATE_SECTION)) {
+            return ResponseEntity.status(403).body(Collections.singletonMap("error", "Access denied!"));
+        }
+
+        Section updated = adminService.updateSection(id, sectionDetails);
+        if (updated != null) {
+            return ResponseEntity.ok(Collections.singletonMap("message", "Section updated successfully"));
+        } else {
+            return ResponseEntity.status(404).body(Collections.singletonMap("error", "Section not found"));
+        }
+    }
+
+    @DeleteMapping("/sections/{id}")
+    public ResponseEntity<?> deleteSection(@RequestHeader("loggedInEmail") String loggedInEmail,
+                                           @PathVariable Long id) {
+        Optional<Employee> admin = employeeService.getEmployeeByEmail(loggedInEmail);
+
+        if (admin.isEmpty() || !RolePermissions.hasPermission(admin.get().getRole(), Permission.DELETE_SECTION)) {
+            return ResponseEntity.status(403).body(Collections.singletonMap("error", "Access denied!"));
+        }
+
+        adminService.deleteSection(id);
+        return ResponseEntity.ok(Collections.singletonMap("message", "Section deleted successfully"));
+    }
+
+    @GetMapping("/sections")
+    public ResponseEntity<?> getAllSections(@RequestHeader("loggedInEmail") String loggedInEmail) {
+        Optional<Employee> admin = employeeService.getEmployeeByEmail(loggedInEmail);
+
+        if (admin.isEmpty() || !RolePermissions.hasPermission(admin.get().getRole(), Permission.READ_ALL_SECTIONS)) {
+            return ResponseEntity.status(403).body(Collections.singletonMap("error", "Access denied!"));
+        }
+
+        List<Section> sections = adminService.getAllSections();
+        return ResponseEntity.ok(sections);
+    }
+
+    @GetMapping("/sections/{id}")
+    public ResponseEntity<?> getSectionById(@RequestHeader("loggedInEmail") String loggedInEmail,
+                                            @PathVariable Long id) {
+        Optional<Employee> admin = employeeService.getEmployeeByEmail(loggedInEmail);
+
+        if (admin.isEmpty() || !RolePermissions.hasPermission(admin.get().getRole(), Permission.READ_ALL_SECTIONS)) {
+            return ResponseEntity.status(403).body(Collections.singletonMap("error", "Access denied!"));
+        }
+
+        Optional<Section> result = adminService.getSectionById(id);
+        if (result.isPresent()) {
+            return ResponseEntity.ok(result.get());
+        } else {
+            return ResponseEntity.status(404).body(Collections.singletonMap("error", "Section not found"));
         }
     }
 }
