@@ -2,9 +2,11 @@ package com.super_market.service;
 
 import com.super_market.model.Employee;
 import com.super_market.model.Product;
+import com.super_market.model.Receipt;
 import com.super_market.model.Section;
 import com.super_market.repository.EmployeeRepository;
 import com.super_market.repository.ProductRepository;
+import com.super_market.repository.ReceiptRepository;
 import com.super_market.repository.SectionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,9 @@ public class AdminService {
 
     @Autowired
     private SectionRepository sectionRepository;
+
+    @Autowired
+    private ReceiptRepository receiptRepository;
 
     //Employee Management
 
@@ -102,5 +107,31 @@ public class AdminService {
 
     public Optional<Section> getSectionById(Long id) {
         return sectionRepository.findById(id);
+    }
+
+    //Receipt Management
+
+    public Receipt createReceipt(Receipt receipt) {
+        return receiptRepository.save(receipt);
+    }
+
+    public void deleteReceipt(Long id) {
+        receiptRepository.deleteById(id);
+    }
+
+    public List<Receipt> getAllReceipts() {
+        return receiptRepository.findAll();
+    }
+
+    public Optional<Receipt> getReceiptById(Long id) {
+        return receiptRepository.findById(id);
+    }
+
+    public List<Receipt> getReceiptsByCashier(String cashierEmail) {
+        return receiptRepository.findByCashierEmail(cashierEmail);
+    }
+
+    public List<Receipt> getReceiptsForLoggedUser(String email) {
+        return receiptRepository.findByCashierEmail(email);
     }
 }

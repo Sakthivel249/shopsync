@@ -246,4 +246,81 @@ public class AdminController {
             return ResponseEntity.status(404).body(Collections.singletonMap("error", "Section not found"));
         }
     }
+
+    //Receipt Controller
+
+    @PostMapping("/receipts")
+    public ResponseEntity<?> createReceipt(@RequestHeader("loggedInEmail") String loggedInEmail,
+                                           @RequestBody Receipt receipt) {
+        Optional<Employee> employee = employeeService.getEmployeeByEmail(loggedInEmail);
+
+        if (employee.isEmpty() || !RolePermissions.hasPermission(employee.get().getRole(), Permission.CREATE_RECEIPT)) {
+            return ResponseEntity.status(403).body(Collections.singletonMap("error", "Access denied!"));
+        }
+
+        Receipt created = adminService.createReceipt(receipt);
+        return ResponseEntity.ok(Collections.singletonMap("message", "Receipt created with ID " + created.getId()));
+    }
+
+    @DeleteMapping("/receipts/{id}")
+    public ResponseEntity<?> deleteReceipt(@RequestHeader("loggedInEmail") String loggedInEmail,
+                                           @PathVariable Long id) {
+        Optional<Employee> employee = employeeService.getEmployeeByEmail(loggedInEmail);
+
+        if (employee.isEmpty() || !RolePermissions.hasPermission(employee.get().getRole(), Permission.DELETE_RECEIPT)) {
+            return ResponseEntity.status(403).body(Collections.singletonMap("error", "Access denied!"));
+        }
+
+        adminService.deleteReceipt(id);
+        return ResponseEntity.ok(Collections.singletonMap("message", "Receipt deleted successfully"));
+    }
+
+    @GetMapping("/receipts")
+    public ResponseEntity<?> getAllReceipts(@RequestHeader("loggedInEmail") String loggedInEmail) {
+        Optional<Employee> employee = employeeService.getEmployeeByEmail(loggedInEmail);
+
+        if (employee.isEmpty() || !RolePermissions.hasPermission(employee.get().getRole(), Permission.READ_ALL_RECEIPTS)) {
+            return ResponseEntity.status(403).body(Collections.singletonMap("error", "Access denied!"));
+        }
+
+        return ResponseEntity.ok(adminService.getAllReceipts());
+    }
+
+    @GetMapping("/receipts/{id}")
+    public ResponseEntity<?> getReceiptById(@RequestHeader("loggedInEmail") String loggedInEmail,
+                                            @PathVariable Long id) {
+        Optional<Employee> employee = employeeService.getEmployeeByEmail(loggedInEmail);
+
+        if (employee.isEmpty() || !RolePermissions.hasPermission(employee.get().getRole(), Permission.READ_RECEIPT)) {
+            return ResponseEntity.status(403).body(Collections.singletonMap("error", "Access denied!"));
+        }
+
+        Optional<Receipt> receipt = adminService.getReceiptById(id);
+        return receipt.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(404).body((Receipt) Collections.singletonMap("error", "Receipt not found")));
+    }
+
+    @GetMapping("/receipts/cashier")
+    public ResponseEntity<?> getCashierReceipts(@RequestHeader("loggedInEmail") String loggedInEmail) {
+        Optional<Employee> employee = employeeService.getEmployeeByEmail(loggedInEmail);
+
+        if (employee.isEmpty() || !RolePermissions.hasPermission(employee.get().getRole(), Permission.READ_CASHIER_RECEIPTS)) {
+            return ResponseEntity.status(403).body(Collections.singletonMap("error", "Access denied!"));
+        }
+
+        List<Receipt> receipts = adminService.getReceiptsByCashier(loggedInEmail);
+        return ResponseEntity.ok(receipts);
+    }
+
+    @GetMapping("/receipts/my")
+    public ResponseEntity<?> getMyReceipts(@RequestHeader("loggedInEmail") String loggedInEmail) {
+        Optional<Employee> employee = employeeService.getEmployeeByEmail(loggedInEmail);
+
+        if (employee.isEmpty() || !RolePermissions.hasPermission(employee.get().getRole(), Permission.READ_MY_RECEIPTS)) {
+            return ResponseEntity.status(403).body(Collections.singletonMap("error", "Access denied!"));
+        }
+
+        return ResponseEntity.ok(adminService.getReceiptsForLoggedUser(loggedInEmail));
+    }
+
 }
