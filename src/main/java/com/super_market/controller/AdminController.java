@@ -14,6 +14,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/admin")
+@CrossOrigin(origins = "http://localhost:5173")
 public class AdminController {
 
     @Autowired
@@ -300,27 +301,5 @@ public class AdminController {
                 .orElseGet(() -> ResponseEntity.status(404).body((Receipt) Collections.singletonMap("error", "Receipt not found")));
     }
 
-    @GetMapping("/receipts/cashier")
-    public ResponseEntity<?> getCashierReceipts(@RequestHeader("loggedInEmail") String loggedInEmail) {
-        Optional<Employee> employee = employeeService.getEmployeeByEmail(loggedInEmail);
-
-        if (employee.isEmpty() || !RolePermissions.hasPermission(employee.get().getRole(), Permission.READ_CASHIER_RECEIPTS)) {
-            return ResponseEntity.status(403).body(Collections.singletonMap("error", "Access denied!"));
-        }
-
-        List<Receipt> receipts = adminService.getReceiptsByCashier(loggedInEmail);
-        return ResponseEntity.ok(receipts);
-    }
-
-    @GetMapping("/receipts/my")
-    public ResponseEntity<?> getMyReceipts(@RequestHeader("loggedInEmail") String loggedInEmail) {
-        Optional<Employee> employee = employeeService.getEmployeeByEmail(loggedInEmail);
-
-        if (employee.isEmpty() || !RolePermissions.hasPermission(employee.get().getRole(), Permission.READ_MY_RECEIPTS)) {
-            return ResponseEntity.status(403).body(Collections.singletonMap("error", "Access denied!"));
-        }
-
-        return ResponseEntity.ok(adminService.getReceiptsForLoggedUser(loggedInEmail));
-    }
 
 }
