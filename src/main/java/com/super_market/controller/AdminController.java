@@ -2,6 +2,7 @@ package com.super_market.controller;
 
 import com.super_market.model.*;
 import com.super_market.repository.EmployeeRepository;
+import com.super_market.repository.ReceiptRepository;
 import com.super_market.service.AdminService;
 import com.super_market.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,8 @@ import java.util.Optional;
 @CrossOrigin(origins = "http://localhost:5173")
 public class AdminController {
 
+    @Autowired
+    private ReceiptRepository receiptRepository;
     @Autowired
     private EmployeeService employeeService;
     @Autowired
@@ -267,13 +270,35 @@ public class AdminController {
     public ResponseEntity<?> deleteReceipt(@RequestHeader("loggedInEmail") String loggedInEmail,
                                            @PathVariable Long id) {
         Optional<Employee> employee = employeeService.getEmployeeByEmail(loggedInEmail);
-
-        if (employee.isEmpty() || !RolePermissions.hasPermission(employee.get().getRole(), Permission.DELETE_RECEIPT)) {
+        if (employee.isEmpty()) {
             return ResponseEntity.status(403).body(Collections.singletonMap("error", "Access denied!"));
         }
 
-        adminService.deleteReceipt(id);
-        return ResponseEntity.ok(Collections.singletonMap("message", "Receipt deleted successfully"));
+        Optional<Receipt> receiptOptional = receiptRepository.findById(id);
+        if (receiptOptional.isEmpty()) {
+            return ResponseEntity.status(404).body(Collections.singletonMap("error", "Receipt not found"));
+        }
+
+        Receipt receipt = receiptOptional.get();
+        Employee loggedInEmployee = employee.get();
+
+        // --- THIS IS THE NEW SECURITY CHECK ---
+        // Allow deletion ONLY IF:
+        // 1. The user is an ADMIN.
+        // OR
+        // 2. The user's email matches the email on the receipt.
+        if (loggedInEmployee.getRole() == Role.ADMIN || receipt.getCashierEmail().equals(loggedInEmail)) {
+            // Check for delete permission before proceeding
+            if (!RolePermissions.hasPermission(loggedInEmployee.getRole(), Permission.DELETE_RECEIPT)) {
+                return ResponseEntity.status(403).body(Collections.singletonMap("error", "You do not have permission to delete receipts."));
+            }
+
+            adminService.deleteReceipt(id);
+            return ResponseEntity.ok(Collections.singletonMap("message", "Receipt deleted successfully"));
+        } else {
+            // If neither condition is met, deny access.
+            return ResponseEntity.status(403).body(Collections.singletonMap("error", "Access Denied: You can only delete your own receipts."));
+        }
     }
 
     @GetMapping("/receipts")

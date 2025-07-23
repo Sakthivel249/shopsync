@@ -29,7 +29,8 @@ public class Product {
     @Column(nullable = false)
     private int quantity;
 
-    @Column(nullable = false)
-    private String category;
+    @ManyToOne
+    @JoinColumn(name = "section_id")
+    private Section section;
 
 }

@@ -1,9 +1,11 @@
 package com.super_market.model;
 
+// The @JsonFormat import is no longer needed
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.relational.core.sql.In;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @Getter
@@ -21,7 +23,7 @@ public class Receipt {
 
     private String customerName;
 
-    private LocalDateTime dateTime;
+    private Instant dateTime;
 
     private double totalAmount;
 
@@ -29,5 +31,4 @@ public class Receipt {
 
     @ElementCollection
     private List<String> items;
-
 }

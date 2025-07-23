@@ -16,8 +16,8 @@ public class RolePermissions {
 
         rolePermissions.put(Role.CASHIER, new HashSet<>(Arrays.asList(
                 Permission.CHANGE_PASSWORD,
-                Permission.CASHIER_CREATE_RECEIPT, Permission.CASHIER_DELETE_RECEIPT,
-                Permission.CASHIER_READ_ALL_RECEIPTS, Permission.CASHIER_READ_MY_RECEIPTS, Permission.CASHIER_READ_RECEIPT
+                Permission.CREATE_RECEIPT, Permission.DELETE_RECEIPT,
+                Permission.READ_ALL_RECEIPTS, Permission.READ_MY_RECEIPTS, Permission.READ_RECEIPT,Permission.READ_ALL_PRODUCTS
         )));
 
         rolePermissions.put(Role.STOREKEEPER, new HashSet<>(Arrays.asList(

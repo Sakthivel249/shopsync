@@ -1,7 +1,10 @@
 package com.super_market.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -21,6 +24,11 @@ public class Section {
 
     @Column(length = 500)
     private String description;
+
+    @OneToMany(mappedBy = "section")
+    @JsonIgnore
+    @ToString.Exclude
+    private List<Product> products;
 
 
 }

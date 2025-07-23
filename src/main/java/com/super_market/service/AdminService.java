@@ -11,6 +11,7 @@ import com.super_market.repository.SectionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,7 +67,7 @@ public class AdminService {
             product.setDescription(newDetails.getDescription());
             product.setPrice(newDetails.getPrice());
             product.setQuantity(newDetails.getQuantity());
-            product.setCategory(newDetails.getCategory());
+            product.setSection(newDetails.getSection());
             return productRepository.save(product);
         }).orElse(null);
     }
@@ -112,6 +113,7 @@ public class AdminService {
     //Receipt Management
 
     public Receipt createReceipt(Receipt receipt) {
+        receipt.setDateTime(Instant.now());
         return receiptRepository.save(receipt);
     }
 
