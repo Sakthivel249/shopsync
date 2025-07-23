@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
     List<Receipt> findByCashierEmail(String cashierEmail);
+    List<Receipt> findByCashierEmailOrderByDateTimeDesc(String cashierEmail);
 }

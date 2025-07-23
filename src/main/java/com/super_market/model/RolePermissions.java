@@ -22,8 +22,8 @@ public class RolePermissions {
 
         rolePermissions.put(Role.STOREKEEPER, new HashSet<>(Arrays.asList(
                 Permission.CHANGE_PASSWORD,
-                Permission.STOREKEEPER_CREATE_PRODUCT, Permission.STOREKEEPER_DELETE_PRODUCT, Permission.STOREKEEPER_UPDATE_PRODUCT, Permission.STOREKEEPER_READ_ALL_PRODUCTS, Permission.STOREKEEPER_READ_SECTION_PRODUCTS,
-                Permission.STOREKEEPER_CREATE_SECTION, Permission.STOREKEEPER_DELETE_SECTION, Permission.STOREKEEPER_UPDATE_SECTION, Permission.STOREKEEPER_READ_ALL_SECTIONS
+                Permission.CREATE_PRODUCT, Permission.DELETE_PRODUCT, Permission.UPDATE_PRODUCT, Permission.READ_ALL_PRODUCTS, Permission.READ_SECTION_PRODUCTS,
+                Permission.CREATE_SECTION, Permission.DELETE_SECTION, Permission.UPDATE_SECTION, Permission.READ_ALL_SECTIONS
         )));
     }
 
